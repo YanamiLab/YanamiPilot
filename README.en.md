@@ -1,6 +1,6 @@
 # Zhihuishu Course Assistant · YanamiPilot
 
-![智慧树刷课助手](docs/assets/banner.svg)
+![智慧树刷课助手](docs/assets/banner.svg?v=zhihuishu)
 
 **A Python + Playwright assistant for Zhihuishu (Zhidao) video courses: 1.5× playback, automatic lesson switching, AI practice pop-up handling, and recovery from playback stalls.**
 
