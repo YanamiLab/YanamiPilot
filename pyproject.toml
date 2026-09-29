@@ -1,0 +1,24 @@
+[project]
+name = "yanamipilot"
+version = "0.1.0"
+description = "Local browser task runner with progress checks, bounded recovery, and human handoff"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+dependencies = ["playwright==1.63.0", "filelock>=3.16,<4"]
+
+[project.optional-dependencies]
+ocr = ["ddddocr==1.6.1"]
+
+[project.scripts]
+yanamipilot = "browser_task_helper.cli:main"
+
+[build-system]
+requires = ["hatchling>=1.26,<2"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/browser_task_helper"]
+
+[tool.uv]
+default-groups = []
