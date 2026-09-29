@@ -1,0 +1,15 @@
+# Copy to config.toml; paths resolve relative to this file.
+url = "https://wisdom-mooc.zhihuishu.com/study/index?recruitAndCourseId=REPLACE_ME"
+expected_videos = 0 # REQUIRED: use the actual catalog count before running
+speed = 1.5
+headless = false
+state_dir = ".browser-task-helper"
+# Omit executable_path to use `playwright install chromium`.
+# executable_path = "/path/to/chromium"
+# Optional: absolute Python interpreter path with the `ocr` extra installed.
+# ocr_python = "/path/to/ocr-env/bin/python"
+exercise_action = "close" # "close", "first_option", or "manual"; AI practice only
+poll_seconds = 2
+load_timeout = 90
+stall_timeout = 120
+max_reloads = 3
