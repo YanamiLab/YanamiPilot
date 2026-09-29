@@ -30,7 +30,9 @@ Use `yanamipilot status` to inspect progress and `yanamipilot stop` to stop. To 
 
 ## Optional local OCR (experimental)
 
-Install with `uv sync --locked --extra ocr`. Color and uppercase-character recognition runs locally through ddddocr. Each attempt requires confirmation for the current challenge. Sliders and uncertain matches use manual completion, followed by automatic playback resumption.
+**Runs on CPU, with about 88 MB of bundled models.** Enable it in an existing project environment with `uv sync --locked --extra ocr`; pretrained models are included in the dependency installation. The measured local OCR environment uses about 340 MB including dependencies, with the browser installed separately. Sizes vary by platform and dependency versions. Recognition starts on demand and exits when finished.
+
+Color and uppercase-character recognition runs locally through ddddocr. Each attempt requires confirmation for the current challenge. Sliders and uncertain matches use manual completion, followed by automatic playback resumption.
 
 Recognition and clicking have passed synthetic local tests; real-platform automatic CAPTCHA acceptance remains to be verified. Version **0.1.0 is a prerelease**. The original runner has real-course playback records; the extracted package has been exercised through the local demo and automated tests. See [validation details](docs/VALIDATION.md).
 
