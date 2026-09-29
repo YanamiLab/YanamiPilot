@@ -1,25 +1,50 @@
-# YanamiPilot · 续航
+# Zhihuishu Course Assistant · YanamiPilot
 
-![YanamiPilot](docs/assets/banner.svg)
+![智慧树刷课助手](docs/assets/banner.svg)
 
-**Keep browser tasks moving. Make interruptions visible.**
+**A Python + Playwright assistant for Zhihuishu (Zhidao) video courses: 1.5× playback, automatic lesson switching, AI practice pop-up handling, and recovery from playback stalls.**
 
-[中文](README.md)
+[中文使用说明](README.md) · [Issues](https://github.com/YanamiLab/YanamiPilot/issues) · [Releases](https://github.com/YanamiLab/YanamiPilot/releases)
 
-A local Python / Playwright runner extracted from real course-playback troubleshooting. Version 0.1.0 includes one Zhihuishu video adapter, bounded recovery, actual playback-rate checks, a persistent browser profile, state files, and an offline two-video demo.
+Run the assistant on your computer, sign in through its browser window, and let it handle the repeated playback controls. It keeps a local browser profile, checks actual playback speed and progress, and verifies completion markers before switching lessons. Routine playback runs entirely through local scripts.
+
+## Quick start
+
+Requires Python 3.11+ and [uv](https://docs.astral.sh/uv/).
 
 ```bash
+git clone https://github.com/YanamiLab/YanamiPilot.git
+cd YanamiPilot
 uv sync --locked
 uv run playwright install chromium
-uv run yanamipilot demo
+cp examples/config.toml config.toml
 ```
 
-The demo runs entirely on loopback with original generated media. To configure a real session, copy `examples/config.toml` to `config.toml`, enter your course URL and actual catalog count, then run `uv run yanamipilot run`. Sign in in the separate browser window. Use `yanamipilot status` and `yanamipilot stop` for local control.
+Fill in your course URL and the actual video count (`expected_videos`) in `config.toml`, then start:
 
-Routine operations require no cloud model or API key. The optional `ocr` extra provides experimental local color/uppercase-character recognition. Each attempt requires fresh, challenge-bound approval; uncertain results and sliders require manual intervention. Real-platform automatic CAPTCHA acceptance is **not validated**. This is not a general website automation engine and does not include remote notifications or agent wake-up integration.
+```bash
+uv run yanamipilot --config config.toml run
+```
 
-Test: `uv run python -m unittest discover -s tests -v`. Build: `uv build`.
+Use `yanamipilot status` to inspect progress and `yanamipilot stop` to stop. To try the two-video local demo, run `uv run yanamipilot demo`.
 
-Use only where automation is permitted. Keep all profiles, login state, screenshots, and runtime data private. See [validation](docs/VALIDATION.md), [roadmap](docs/ROADMAP.md), [contributing](CONTRIBUTING.md), and [third-party notices](THIRD_PARTY_NOTICES.md).
+## Optional local OCR (experimental)
 
-MIT. Developed from a standalone browser runner during work involving [university-helper](https://github.com/sweetcornna/university-helper); the upstream backend is not bundled or required. No affiliation with OpenAI or course platforms.
+Install with `uv sync --locked --extra ocr`. Color and uppercase-character recognition runs locally through ddddocr. Each attempt requires confirmation for the current challenge. Sliders and uncertain matches use manual completion, followed by automatic playback resumption.
+
+Recognition and clicking have passed synthetic local tests; real-platform automatic CAPTCHA acceptance remains to be verified. Version **0.1.0 is a prerelease**. The original runner has real-course playback records; the extracted package has been exercised through the local demo and automated tests. See [validation details](docs/VALIDATION.md).
+
+## Contributing
+
+Bug reports, adapter improvements, tests, and documentation are welcome. See [contributing](CONTRIBUTING.md) and the [roadmap](docs/ROADMAP.md). Keep browser profiles, login state, and personal course data private.
+
+```bash
+uv run python -m unittest discover -s tests -v
+uv build
+```
+
+## Credits and license
+
+[MIT](LICENSE). The project grew out of browser-playback improvements made while using [university-helper](https://github.com/sweetcornna/university-helper), and is packaged as an independent Python application. Thanks to Playwright, ddddocr, and the projects listed in [third-party notices](THIRD_PARTY_NOTICES.md).
+
+Use with courses you are authorized to access and where automation is permitted.

@@ -1,7 +1,7 @@
 [project]
 name = "yanamipilot"
 version = "0.1.0"
-description = "Local browser task runner with progress checks, bounded recovery, and human handoff"
+description = "智慧树（知到）刷课助手：1.5 倍速、自动切课、随堂练习弹窗处理与卡顿恢复"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"

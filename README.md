@@ -1,97 +1,111 @@
-# 续航 · YanamiPilot
+# 智慧树刷课助手 · YanamiPilot
 
-![YanamiPilot](docs/assets/banner.svg)
+![智慧树刷课助手：1.5 倍速、自动切课、随堂练习、卡顿恢复](docs/assets/banner.svg)
 
-**浏览器任务，持续推进。遇到异常，有据可查。**
+**智慧树（知到）视频自动播放助手，支持 1.5 倍速、自动切课、AI 随堂练习弹窗处理和卡顿恢复。**
 
-[English](README.en.md) · [验证记录](docs/VALIDATION.md) · [路线图](docs/ROADMAP.md) · [贡献指南](CONTRIBUTING.md)
+[快速开始](#快速开始) · [常用设置](#常用设置) · [问题反馈](https://github.com/YanamiLab/YanamiPilot/issues) · [下载版本](https://github.com/YanamiLab/YanamiPilot/releases) · [English](README.en.md)
 
-YanamiPilot 是一个本地 Python / Playwright 浏览器任务助手。它把重复操作交给脚本，把加载故障、进度停滞和需要人工接管的情况明确记录下来。
+播放完一节还要点下一节，看到一半弹出练习，挂着挂着又卡在加载页——这个助手就是为这些重复操作写的。基于 Python + Playwright，在本机打开浏览器，登录课程后自动接着播放。
 
-首版从实际课程播放问题中提取，提供一个智慧树视频适配器和完全本地的演示。常规运行不调用云端模型，也不需要 OpenAI API Key。项目目前为 **0.1.0 实验版本**。
+## 功能
 
-## 已实现
+- **1.5 倍速播放**：自动设置倍速，同时检查播放器的实际速度。
+- **自动切换视频**：按目录寻找待完成的视频，播放结束后核对完成标记，再继续下一节。
+- **处理随堂练习**：自动关闭 AI 随堂练习弹窗，也可设置为选择首项或手动作答。
+- **卡顿自动恢复**：加载超时、播放停滞时自动刷新重试，并保存故障记录。
+- **保留登录状态**：使用独立浏览器目录，方便下次继续运行。
+- **查看运行进度**：记录当前章节、视频进度和实际倍速，支持接入外部监控。
+- **验证后自动续播**：完成安全验证后继续播放；可选本地 OCR 辅助点选识别（实验功能）。
 
-- **实际进度监控**：区分脚本心跳、状态持续时间与媒体播放时间，读取真实倍速及菜单文字。
-- **有上限的故障恢复**：目录、播放器加载超时及播放停滞可自动刷新，重试耗尽明确报错。
-- **独立浏览器会话**：保留本地登录配置，使用单实例锁，清理本会话内重复课程页。
-- **随堂练习策略**：默认关闭 AI 随堂练习弹窗，也可配置等待人工或选择首项；限定于该弹窗，不处理章节考试。
-- **人工接管与续播**：遇到验证码暂停播放，记录当前挑战；人工完成后检测媒体是否继续推进。
-- **可选本地识别桥接**：支持有限的颜色与大写字母点选识别；当次确认、图片绑定、一次尝试、120 秒授权有效期。滑块须人工处理。
-- **本地状态接口**：原子写入 JSON 状态，JSONL 仅记录状态转换，方便外部监控接入。
+日常播放由本地脚本每 2 秒检查一次，云端模型调用费用为零。当前版本为 **v0.1.0 预发布版**；适配范围为智慧树视频学习页及其中的 AI 随堂练习弹窗。原型已有实课运行记录，独立包已完成本地演示与自动测试，详细结果见[验证记录](docs/VALIDATION.md)。
 
-验证码识别在自制测试页面上验证过，**尚无真实平台自动通过的验收结论**。点击后弹窗消失和媒体继续播放仅属于行为证据，不等于检查了平台验证接口。首版没有内置云端模型、即时唤醒 Codex、消息通知服务或通用网站适配器。
+## 快速开始
 
-## 30 秒了解工作方式
-
-```text
-启动浏览器 → 登录 → 核对目录 → 选择待完成视频 → 检查实际播放
-                           ↑                       │
-                           └── 播放结束后复核标记 ─┘
-加载超时 → 有限刷新 → 恢复 / 明确报错
-验证弹窗 → 暂停并记录 → 人工接管或当次批准本地识别 → 验证续播
-```
-
-## 安装与本地演示
-
-需要 Python 3.11+ 和 [uv](https://docs.astral.sh/uv/)。在源码目录执行：
+准备好 Python 3.11+ 和 [uv](https://docs.astral.sh/uv/getting-started/installation/)，然后下载并安装：
 
 ```bash
+git clone https://github.com/YanamiLab/YanamiPilot.git
+cd YanamiPilot
 uv sync --locked
 uv run playwright install chromium
-uv run yanamipilot demo
+cp examples/config.toml config.toml
 ```
 
-演示仅访问临时的 `127.0.0.1` 页面，生成并播放两段本地视频，经过练习弹窗、章节切换和完成复核；不需要平台账号。退出后清理临时浏览器配置和服务器。Linux 系统可能还需要 `uv run playwright install --with-deps chromium`，涉及系统包安装时按本机权限处理。
+打开 `config.toml`，填写：
 
-已有兼容的 Chromium 时，可以给演示设置 `BROWSER_EXECUTABLE` 环境变量，实际运行则设置配置里的 `executable_path`，避免重复下载。
+- `url`：浏览器中打开的智慧树课程学习页地址。
+- `expected_videos`：这门课目录中的视频总数。
 
-## 运行自己的课程
+启动助手，在弹出的浏览器中登录课程：
 
 ```bash
-cp examples/config.toml config.toml
-# 编辑 url、expected_videos 以及需要的本机路径
 uv run yanamipilot --config config.toml run
 ```
 
-默认打开可见的独立浏览器，请在该窗口登录。`expected_videos` 应填写实际目录视频数：目录数量不符时不会宣布完成。仅在平台允许、你有权操作的场景使用。
+助手会核对目录、找到待完成视频，并按配置继续播放。查看进度或停止运行：
 
 ```bash
 uv run yanamipilot --config config.toml status
 uv run yanamipilot --config config.toml stop
 ```
 
-状态文件位于配置指定的本地目录。`time` 是心跳；`state_since` 是同一状态的开始时间；`media.time` 是视频播放进度。`catalog` 是最近一次目录核查结果，并非每两秒重新查询平台成绩。
+想先试试？运行 `uv run yanamipilot demo`，即可体验本地两段视频的播放、练习弹窗处理和自动切换。
 
-## 可选 OCR
+## 常用设置
+
+| 配置项 | 默认值 | 作用 |
+| --- | --- | --- |
+| `speed` | `1.5` | 视频播放倍速 |
+| `exercise_action` | `"close"` | AI 随堂练习：`close` 关闭、`first_option` 选择首项、`manual` 手动作答 |
+| `poll_seconds` | `2` | 页面检查间隔，单位为秒 |
+| `load_timeout` | `90` | 持续加载超过这个秒数后尝试刷新 |
+| `stall_timeout` | `120` | 视频进度停滞超过这个秒数后尝试刷新 |
+| `max_reloads` | `3` | 连续异常时的刷新次数上限 |
+| `headless` | `false` | 默认显示浏览器，方便登录与处理验证 |
+
+完整示例见 [examples/config.toml](examples/config.toml)。登录状态、截图和进度文件保存在本机，请妥善保管。
+
+<details>
+<summary>浏览器安装与状态文件</summary>
+
+Linux 可使用 `uv run playwright install --with-deps chromium` 安装浏览器及系统依赖。
+
+已有兼容 Chromium 时，设置 `executable_path` 指向其可执行文件。本地演示支持通过 `BROWSER_EXECUTABLE` 指定浏览器。
+
+状态文件中的 `media.time` 表示视频进度，`time` 表示脚本最近一次检查时间，`state_since` 表示当前状态开始时间；`catalog` 保存最近一次目录核查结果。可据此接入自己的监控工具。
+
+</details>
+
+## 本地 OCR 辅助验证（实验）
+
+支持颜色与大写字母点选识别，使用 ddddocr 在本机处理图片。模型按需加载，用完释放。
 
 ```bash
 uv sync --locked --extra ocr
 ```
 
-也可以把 OCR 依赖装在另一个独立环境或外置盘，只需该环境安装本项目的 `ocr` extra。配置 `ocr_python` 指向该 Python 解释器；路径不会写死。识别进程按需启动，完成后退出，不常驻。
-
-验证发生时查看当前浏览器与 `challenge-screen.png`。确认处理当前挑战后执行：
+遇到验证时，查看浏览器和 `challenge-screen.png`，确认当前验证内容后运行：
 
 ```bash
 uv run yanamipilot --config config.toml approve CURRENT_CHALLENGE_ID
 ```
 
-命令会显示提示并要求输入 `yes`。授权绑定当前挑战，一次消费；过期、图片变化、候选不唯一或不支持的类型需要人工处理。人工完成后会自动尝试续播。
+按提示输入 `yes`，脚本会对当前验证码尝试一次识别与点击。每次确认绑定当前图片，有效期为 120 秒；滑块及识别结果存疑的情况由用户在浏览器中完成，随后助手尝试续播。
 
-## 开发
+**测试进度：本地模拟页面上的识别与点击已通过，真实平台自动通过仍待验证。** 也可将 OCR 安装在独立环境或外置盘，通过 `ocr_python` 指定该环境的 Python 路径。
+
+## 反馈与参与
+
+遇到卡顿、弹窗或页面改版，欢迎[提交 Issue](https://github.com/YanamiLab/YanamiPilot/issues)，附上助手版本、系统、问题描述和脱敏后的日志。欢迎补充适配、测试用例和使用教程，详见[贡献指南](CONTRIBUTING.md)与[后续计划](docs/ROADMAP.md)。
 
 ```bash
-uv sync --locked
-uv run playwright install chromium
 uv run python -m unittest discover -s tests -v
 uv build
 ```
 
-测试使用原创本地页面，不访问真实课程、不读取个人配置。仓库配有 GitHub Actions 工作流；只有远程实际运行成功后，才能称为 CI 通过。
+## 致谢与许可
 
-## 来源与许可
+[MIT](LICENSE) 开源。项目起于使用 [university-helper](https://github.com/sweetcornna/university-helper) 时对浏览器播放流程的改进，现已整理为独立 Python 包。感谢 Playwright、ddddocr 等开源项目，来源与许可见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 
-MIT。项目在使用 [university-helper](https://github.com/sweetcornna/university-helper) 的实际维护过程中形成，浏览器执行器在本地单独编写后提取为独立 Python 包，运行时不依赖其后端。本项目没有把上游完整代码库改名发布。
-
-Playwright、ddddocr 及其依赖保留各自许可；完整来源与第三方说明见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。YanamiPilot 与课程平台、OpenAI 均无官方隶属或背书关系。
+请在平台允许且有权操作的课程中使用。
