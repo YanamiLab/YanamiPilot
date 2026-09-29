@@ -1,6 +1,6 @@
 # 智慧树刷课助手 · YanamiPilot
 
-![智慧树刷课助手：1.5 倍速、自动切课、随堂练习、卡顿恢复](docs/assets/banner.svg?v=zhihuishu)
+![智慧树刷课助手：1.5 倍速、自动切课、随堂练习、卡顿恢复](https://raw.githubusercontent.com/YanamiLab/YanamiPilot/a22a4f7d6e8d29aedacd91685cd2615c6fae8a41/docs/assets/banner.svg)
 
 **智慧树（知到）视频自动播放助手，支持 1.5 倍速、自动切课、AI 随堂练习弹窗处理和卡顿恢复。**
 
